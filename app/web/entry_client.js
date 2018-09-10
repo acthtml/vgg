@@ -6,8 +6,8 @@
  * @see  https://github.com/vuejs/vue-hackernews-2.0/blob/master/src/entry-client.js
  */
 import 'babel-polyfill';
-import createApp from './app';
-import plugin from './plugin';
+import createApp from '../../src/core/app';
+import plugin from '../../src/core/plugin';
 
 const appContext = createApp({siteRoot:window.__SITE_ROOT__});
 const {appCreator, router, store} = appContext;

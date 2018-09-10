@@ -1,14 +1,17 @@
 /**
  * app实例
  *
+ * - hook app.contextLoaded
+ *
  * @module core/app
  */
 import Vue from 'vue';
 import { sync } from 'vuex-router-sync';
 import plugin from './plugin';
-import loadConfig from './loadConfig';
+import loadConfig from './load_config';
 import loadCommon from './load_common';
 import loadContext from './load_context';
+import loadAppComponent from './load_app_component';
 import createStore from './create_store';
 import createRouter from './create_router';
 
@@ -42,12 +45,13 @@ export default (context) => {
   // 同步路由状态 @see https://github.com/vuejs/vuex-router-sync
   sync(store, router);
 
-  // 6. hook app/afterContextLoaded
-  plugin.invokeAll('app.afterContextLoaded', {store, router, ...context, ...ctx})
+  // 6. hook app.contextLoaded
+  plugin.invokeAll('app.contextLoaded', {store, router, ...context, ...ctx})
 
   // 返回构造app构造函数，为了在客户端环境，store的状态能在router挂载时初始好，这样就能做
   // 服务端的权限判断了。
   let app;
+  let appComponent = loadAppComponent();
   const appCreator = () => {
     if(!app){
       app = new Vue({

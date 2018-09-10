@@ -1,7 +1,7 @@
 /**
  * 插件配置
  */
-export default {
+module.exports = {
   pluginA: '../plugins/plugin_a',
   pluginB: '../plugins/plugin_b'
 }

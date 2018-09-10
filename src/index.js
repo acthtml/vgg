@@ -1,7 +1,8 @@
-import plugin from './plugin';
+import plugin from './core/plugin';
 
 let vgg = {};
-vgg.env = WEBPACK_ENV;
+vgg.env = 'local';
+// vgg.env = WEBPACK_ENV;
 vgg.entryType = WEBPACK_ENTRY_TYPE;
 vgg.plugin = plugin;
 

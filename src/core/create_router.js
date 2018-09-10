@@ -23,7 +23,7 @@ export default (context) => {
 
   // default router config.
   let routerConfig = _.get(vgg.config, 'router', {});
-  Object.assign({
+  routerConfig = Object.assign({
     mode: 'history',
     // 需要设置base，因为eggjs还不允许根目录形式注入。
     // 配置参考 https://router.vuejs.org/zh-cn/api/options.html#base
@@ -34,34 +34,39 @@ export default (context) => {
     ...routerConfig
   });
 
-
   // hook router.onError
   router.onError(async () => {
-    await plugin.invokeAll('router.onError', router, context);
+    await plugin.invokeAll('router.onError', {...context, router});
   })
 
-  // hook router.beforeEach
+  // // hook router.beforeEach
   router.beforeEach(async (to, from, next) => {
-    await plugin.invokeAllAsync('router.beforeEach', router, to, from, next, context)
+    let processed = false;
+    await plugin.invokeAllAsync('router.beforeEach', to, from, next, {...context, router})
       .then(isNext => {
-        if(isNext){
-          next();
-        }else{
+        processed = true;
+        if(_.isBoolean(isNext) && !isNext){
           next(false);
+        }else{
+          next();
         }
       })
       .catch(e => {
+        processed = true;
         next(e);
+      })
+      .finally(() => {
+        if(!processed) next();
       })
   });
 
-  // hook router.afterEach
-  router.afterEach(async (to, from, next) => {
-    await plugin.invokeAllAsync('router.beforeEach', router, to, from, context);
+  // // hook router.afterEach
+  router.afterEach(async (to, from) => {
+    await plugin.invokeAllAsync('router.afterEach', to, from, {...context, router});
   });
 
   // hook router.alter
-  plugin.invokeAll('router.alter', router, context);
+  plugin.invokeAll('router.alter',{...context, router});
   return router;
 };
 
@@ -73,12 +78,16 @@ export default (context) => {
 function getRoutes(){
   let plugins = plugin.list();
   let routes = [];
-  plugins.each((pname, index) => {
-    let mod = plugin.getModule('router/routes', pname);
+  for(let i = 0; i < plugins.length; i++){
+    let mod = plugin.getModule('router/routes', plugins[i]);
     if(mod && mod.default && _.isArray(mod.default)){
       routes = routes.concat(mod.default);
     }
-  });
+  }
+
+  return [
+    {path: '/', component: () => import('../../app/web/views/welcome.vue')}
+  ]
 
   return _.unionBy(routes, 'path');
 }

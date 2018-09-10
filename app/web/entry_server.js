@@ -5,7 +5,8 @@
  *
  * @see  https://github.com/vuejs/vue-hackernews-2.0/blob/master/src/entry-server.js
  */
-import createApp from './app';
+import createApp from '../../src/core/app';
+import plugin from '../../src/core/plugin';
 
 export default context => {
   const appContext = createApp(context, 'server');
@@ -13,7 +14,7 @@ export default context => {
   const app = appCreator();
 
   // hook app.appCreated
-  plugin.invokeAll('app.appCreated', appContext);
+  // plugin.invokeAll('app.appCreated', appContext);
 
   // 解析动态组件。
   router.push(context.url);
@@ -31,9 +32,12 @@ export default context => {
         app,
         route: router.currentRoute
       }))).then(() => {
-        context.state = store.state
+        context.state = store.state;
         res(app);
-      }).catch(rej)
+      }).catch(e => {
+        console.log(1111, e);
+        rej(e);
+      })
     }, rej)
   })
 }

@@ -3,8 +3,8 @@
  *
  * - 返回store实例
  * - 为store添加辅助方法
- * - hook store.alterStore
  * - 在config.store中进行配置，参考https://vuex.vuejs.org/zh/api/#vuex-store-%E6%9E%84%E9%80%A0%E5%99%A8%E9%80%89%E9%A1%B9
+ * - hook store.alter
  *
  * @module core/create_store
  */
@@ -38,7 +38,8 @@ export default context => {
     if(!modulepath) modulepath = namespace;
     // 模块的引用统一成下划线命名模式，snakeCase
     modulepath = modulepath.split('/').map(i => _.snakeCase(i)).join('/')
-    let mod = require('./modules/' + modulepath).default;
+    let mod = null;
+    // require('./modules/' + modulepath).default;
     this.registerModule(namespace, mod(namespace, {...context, store}, ...args));
     return true;
   }
@@ -139,7 +140,7 @@ export default context => {
   }
 
   // Hook store.alter
-  plugin.invokeAll('store.alter', store, context);
+  plugin.invokeAll('store.alter', {...context, store});
   return store;
 }
 

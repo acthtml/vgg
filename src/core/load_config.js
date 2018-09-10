@@ -3,6 +3,7 @@
  *
  * @module core/load_config
  */
+import _ from 'lodash';
 import vgg from '../';
 import plugin from './plugin';
 
