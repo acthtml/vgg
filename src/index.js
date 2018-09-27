@@ -1,9 +1,10 @@
+/**
+ * vgg
+ */
 import plugin from './core/plugin';
 
-let vgg = {};
-vgg.env = 'local';
-// vgg.env = WEBPACK_ENV;
+const vgg = {};
+vgg.env = typeof WEBPACK_ENV == 'undefined' ? 'local' : WEBPACK_ENV;
 vgg.entryType = WEBPACK_ENTRY_TYPE;
 vgg.plugin = plugin;
-
 export default vgg;

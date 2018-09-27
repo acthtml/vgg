@@ -21,11 +21,8 @@ export default () => {
     // 2. 加载插件中的
     let plugins = plugin.list(true);
     for(let i = 0; i < plugins.length; i++){
-      try{
-        appComponent = plugin.getModule('views/app.vue', plugins[i]).default;
-        if(appComponent) return appComponent;
-      }catch(e){
-      }
+      appComponent = plugin.getModule('views/app.vue', plugins[i]);
+      if(appComponent) break;
     }
   }
   return appComponent;

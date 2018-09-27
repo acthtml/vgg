@@ -14,7 +14,7 @@ export default context => {
   const app = appCreator();
 
   // hook app.appCreated
-  // plugin.invokeAll('app.appCreated', appContext);
+  plugin.invokeAll('app.appCreated', appContext);
 
   // 解析动态组件。
   router.push(context.url);
@@ -32,12 +32,9 @@ export default context => {
         app,
         route: router.currentRoute
       }))).then(() => {
-        context.state = store.state;
+        context.state = store.state
         res(app);
-      }).catch(e => {
-        console.log(1111, e);
-        rej(e);
-      })
+      }).catch(rej)
     }, rej)
   })
 }

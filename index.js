@@ -1,3 +1,2 @@
-const plugin = require('./src/core/plugin');
-
-console.log(plugin.list());
+const plugin = require('./tools/plugin');
+plugin.run()

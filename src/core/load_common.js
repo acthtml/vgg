@@ -11,13 +11,20 @@ import plugin from './plugin';
 import vgg from '../index';
 
 export default (context) => {
-  // directive
-  plugin.assign('common/directive');
-  // filter
-  plugin.assign('common/filter');
-  // plugin
-  plugin.assign('common/plugins');
-  // utils
-  let utils = plugin.assign('common/utils');
-  vgg.utils = utils;
+  let resources = ['directive', 'filter', 'plugins', 'utils'];
+  resources.forEach(resource => {
+    let sets = plugin.assign(`common/${resource}`);
+    if(resource == 'utils'){
+      vgg.utils = sets;
+      return;
+    }
+
+    for(let key in sets){
+      if(resource == 'plugins'){
+        Vue.use(sets[key]);
+      }else{
+        Vue[resource](key, sets[key]);
+      }
+    }
+  })
 }

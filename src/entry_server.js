@@ -8,12 +8,17 @@
 import createApp from './app';
 
 export default context => {
+  console.log(11112221)
   const appContext = createApp(context, 'server');
+  console.log(11112223)
   const {appCreator, router, store} = appContext;
   const app = appCreator();
 
+  console.log(1111222)
+
   // hook app.appCreated
   plugin.invokeAll('app.appCreated', appContext);
+
 
   // 解析动态组件。
   router.push(context.url);

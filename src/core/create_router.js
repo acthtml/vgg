@@ -15,14 +15,15 @@ import _ from 'lodash';
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import plugin from './plugin';
-import vgg from '../index';
-
+import loadConfig from './load_config';
+const config = loadConfig();
 Vue.use(VueRouter);
+
 export default (context) => {
   let routes = getRoutes();
 
   // default router config.
-  let routerConfig = _.get(vgg.config, 'router', {});
+  let routerConfig = _.get(config, 'router', {});
   routerConfig = Object.assign({
     mode: 'history',
     // 需要设置base，因为eggjs还不允许根目录形式注入。
@@ -39,7 +40,7 @@ export default (context) => {
     await plugin.invokeAll('router.onError', {...context, router});
   })
 
-  // // hook router.beforeEach
+  // hook router.beforeEach
   router.beforeEach(async (to, from, next) => {
     let processed = false;
     await plugin.invokeAllAsync('router.beforeEach', to, from, next, {...context, router})
@@ -66,7 +67,7 @@ export default (context) => {
   });
 
   // hook router.alter
-  plugin.invokeAll('router.alter',{...context, router});
+  plugin.invokeAll('router.alter', {...context, router});
   return router;
 };
 
@@ -80,14 +81,10 @@ function getRoutes(){
   let routes = [];
   for(let i = 0; i < plugins.length; i++){
     let mod = plugin.getModule('router/routes', plugins[i]);
-    if(mod && mod.default && _.isArray(mod.default)){
-      routes = routes.concat(mod.default);
+    if(mod && _.isArray(mod)){
+      routes = routes.concat(mod);
     }
   }
-
-  return [
-    {path: '/', component: () => import('../../app/web/views/welcome.vue')}
-  ]
 
   return _.unionBy(routes, 'path');
 }

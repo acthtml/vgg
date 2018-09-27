@@ -1,7 +1,5 @@
 <template>
-  <div id="app">
-    <h2>app.vue</h2>
-  </div>
+  <h1>plugin a</h1>
 </template>
 <script>
   export default {}
