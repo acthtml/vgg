@@ -25,8 +25,8 @@ export default () => {
   // test plugins
   describe('plugin', () => {
     it('plugin.list', () => {
-      expect(vgg.plugin.list().join(',')).to.be('vgg,pluginA,pluginD,pluginB,~');
-      expect(vgg.plugin.list(true).join(',')).to.be('~,pluginB,pluginD,pluginA,vgg');
+      expect(vgg.plugin.list().join(',')).to.be('vgg,pluginD,pluginA,pluginB,~');
+      expect(vgg.plugin.list(true).join(',')).to.be('~,pluginB,pluginA,pluginD,vgg');
     });
 
     it('plugin.getModule', () => {

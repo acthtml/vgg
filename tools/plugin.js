@@ -2,9 +2,10 @@
  * 插件的管理和运行时生成。
  */
 const path = require('path');
+const fs = require('fs-extra');
 const _ = require('lodash');
 const Toposort = require('toposort-class');
-const fs = require('fs-extra');
+const chokidar = require('chokidar');
 
 /**
  * 插件列表，顺序为安装顺序，要依赖的插件总是在插件之前，先声明的插件总是在声明的插件之前，核
@@ -24,21 +25,19 @@ let cacheList;
  */
 let cachePlugins;
 
-const plugin = {
+module.exports = {
   /**
    * 扫描vgg架构目录，在指定文件夹生成插件运行时文件(plugin_runtime.js)。
    * @param  {Boolean} watchmode 是否进行监控。
    * @return {[type]}            [description]
    */
   async run(watchmode = false){
-    console.log('插件扫描开始')
     await this.scan();
-    this.write();
+    await this.write();
     if(watchmode){
       this.watch();
     }
-
-    console.log('插件扫描结束：', cacheList, cachePlugins);
+    console.log('插件扫描结果：', cacheList.join(', '));
   },
   /**
    * 扫描所有插件，创建：插件列表，插件对象列表。
@@ -66,7 +65,6 @@ const plugin = {
       cacheList.push(key);
     }
   },
-
   /**
    * 根据插件目录写入运行时文件
    * @return {[type]} [description]
@@ -79,47 +77,41 @@ const plugin = {
       });
 
     // 写入的内容。
-    let content = getRuntimeContent();
+    let content = createRuntimeFileContent();
     await fs.writeFile(file, content)
       .catch(e => {
         throw new Error('plugin_runtime.js文件无法写入。')
-      })
+      });
   },
-  watch(){},
-  getRuntimeContent(){
-    let content = '';
-    for(let i = 0; i < cacheList.length; i++){
-      let name = cacheList[i],
-          plugin = cachePlugins[name],
-          regx = '/(api\/.*|store\/.*|config\/.*|common\/(context|directive|filter|plugins|utils)\/index|views\/app';
-      if(plugin.components){
-        regx += '|components\/index';
-      }
-      if(plugin.routes){
-        regx += '|router\/index|router\/routes'
-      }else{
-        regx += '|router\/index'
-      }
-      regx += ')\.(js|vue|json)$/';
+  /**
+   * 监测插件配置文件，有变化时，重新创建runtime。
+   * @return {[type]} [description]
+   */
+  watch(){
+    // 关闭历史监测，根据新的文件列表创建新的监测。
+    if(this.watcher) this.watcher.close();
 
-      content += `
-        '${name}': {
-          context: require.context('${plugin.package}', true, ${regx}),
-          components: ${plugin.components ? 'true' : 'false'},
-          routes: ${plugin.routes ? 'true' : 'false'}
-        },
-      `
-    }
-    content = `
-      export default {
-        ${content}
-      }
-    `;
-    return content;
-  }
-}
+    // 需要监测的文件
+    let files = [];
+    for(let key in cachePlugins){
+      let plugin = cachePlugins[key];
+      if(plugin.package.indexOf('.') != 0) continue;
+      files.push(path.join(process.cwd(), 'run', plugin.package, 'config/plugin.js'));
+      files.push(path.join(process.cwd(), 'run', plugin.package, 'config/plugin.json'));
+    };
 
-module.exports = plugin;
+    // 开始监测
+    let ready = false;
+    this.watcher = chokidar.watch(files);
+    this.watcher.on('all', p => {
+      if(ready) this.run(true);
+    });
+    this.watcher.on('ready', () => {
+      ready = true;
+    });
+  },
+  watcher: null
+};
 
 /**
  * 扫描插件配置。
@@ -148,10 +140,10 @@ async function _scan(configs, parent, baseDir, toposort){
     if(!parent || parent == 'vgg' || parent == '~'){
       toposort.add(name, []);
     }else{
-      toposort.add(name, parent);
+      toposort.add(parent, name);
     }
     cachePlugins[name].scaned = true;
-    let depConfigs = getModule('config/plugin', name);
+    let depConfigs = getModule('config/plugin', name, false);
     if(depConfigs){
       await _scan(depConfigs, name, config.package, toposort);
     }
@@ -222,7 +214,7 @@ function getRelativePathFromRoot(target){
  * @param  {[type]} pluginName [description]
  * @return {[type]}            [description]
  */
-function getModule(modulePath, pluginName){
+function getModule(modulePath, pluginName, cache = true){
   let pack = cachePlugins[pluginName].package;
   if(!pack) return null;
 
@@ -231,7 +223,54 @@ function getModule(modulePath, pluginName){
     pack = path.join(process.cwd(), 'run/', pack);
   }
   try{
-    mod = require(path.join(pack, modulePath));
-  }catch(e){}
+    modulePath = path.join(pack, modulePath);
+    if(!cache){
+      delete require.cache[require.resolve(modulePath)];
+    }
+    mod = require(modulePath);
+  }catch(e){
+    if(e instanceof SyntaxError){
+      console.error(e);
+    }
+  }
   return mod;
+}
+
+/**
+ * 创建plugin_time.js文件的文本内容。
+ * @return {[type]} [description]
+ */
+function createRuntimeFileContent(){
+  let content = '';
+  for(let i = 0; i < cacheList.length; i++){
+    let name = cacheList[i],
+        plugin = cachePlugins[name],
+        regx = '/(api\\/.*|store\\/.*|config\\/.*|common\\/(context|directive|filter|plugins|utils)\\/index|views\\/app';
+    if(plugin.components){
+      regx += '|components\\/index';
+    }
+    if(plugin.routes){
+      regx += '|router\\/index|router\\/routes'
+    }else{
+      regx += '|router\\/index'
+    }
+    regx += ')\\.(js|vue|json)$/';
+
+    content += `
+      '${name}': {
+        context: require.context('${plugin.package}', true, ${regx}),
+        components: ${plugin.components ? 'true' : 'false'},
+        routes: ${plugin.routes ? 'true' : 'false'}
+      },
+    `
+  }
+  content = `
+    /**
+     * plugin runtime created by vgg.
+     */
+    export default {
+      ${content}
+    }
+  `;
+  return content;
 }

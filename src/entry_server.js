@@ -5,16 +5,13 @@
  *
  * @see  https://github.com/vuejs/vue-hackernews-2.0/blob/master/src/entry-server.js
  */
-import createApp from './app';
+import createApp from './core/app';
+import plugin from './core/plugin';
 
 export default context => {
-  console.log(11112221)
   const appContext = createApp(context, 'server');
-  console.log(11112223)
   const {appCreator, router, store} = appContext;
   const app = appCreator();
-
-  console.log(1111222)
 
   // hook app.appCreated
   plugin.invokeAll('app.appCreated', appContext);
