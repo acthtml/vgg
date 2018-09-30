@@ -1,6 +1,9 @@
 <template>
-  <h1>vgg</h1>
+  <div>
+    <h1>vgg</h1>
+  </div>
 </template>
 <script>
-  export default {}
+  export default {
+  }
 </script>

@@ -5,7 +5,8 @@
  *
  * @see  https://github.com/vuejs/vue-hackernews-2.0/blob/master/src/entry-server.js
  */
-import createApp from './app';
+import createApp from './core/app';
+import plugin from './core/plugin';
 
 export default context => {
   const appContext = createApp(context, 'server');
@@ -14,6 +15,7 @@ export default context => {
 
   // hook app.appCreated
   plugin.invokeAll('app.appCreated', appContext);
+
 
   // 解析动态组件。
   router.push(context.url);

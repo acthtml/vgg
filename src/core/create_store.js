@@ -12,8 +12,8 @@ import _ from 'lodash';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import plugin from './plugin';
-import vgg from '../';
-
+import loadConfig from './load_config';
+const config = loadConfig();
 Vue.use(Vuex);
 
 /**
@@ -22,7 +22,7 @@ Vue.use(Vuex);
  * @return {[type]}       [description]
  */
 export default context => {
-  let store = new Vuex.Store(_.get(vgg.config, 'store', {}));
+  let store = new Vuex.Store(_.get(config, 'store', {}));
 
   /**
    * 给store动态添加模块，保证不会在命名空间上重复添加。
@@ -37,11 +37,15 @@ export default context => {
     if(this.isRegistered(namespace)) return false;
     if(!modulepath) modulepath = namespace;
     // 模块的引用统一成下划线命名模式，snakeCase
-    modulepath = modulepath.split('/').map(i => _.snakeCase(i)).join('/')
-    let mod = null;
-    // require('./modules/' + modulepath).default;
-    this.registerModule(namespace, mod(namespace, {...context, store}, ...args));
-    return true;
+    let {filename, pluginName} = plugin.parseModulePath(modulepath);
+    filename = filename.split('/').map(i => _.snakeCase(i)).join('/');
+    try{
+      let mod = plugin.getModule('store/' + filename, pluginName);
+      this.registerModule(namespace, mod(namespace, {...context, store}, ...args));
+      return true;
+    }catch(e){
+      throw new Error(`store ${namespace}注册出错，filename:${filename}, pluginName:${pluginName}`);
+    }
   }
 
   /**
