@@ -75,8 +75,9 @@ export default {
       try{
         mod = pluginRuntime[pluginName].context('./' + indexFilenames[i]);
       }catch(e){
+        // 语法错误进行提示
         if(e.message.indexOf('Cannot find module') < 0){
-          console.warn(e);
+          console.error(e);
         }
       }
       if(mod) break;

@@ -1,5 +1,7 @@
 /**
- * 插件的管理和运行时生成。
+ * 插件的扫描和管理。
+ *
+ * @module tools/plugin
  */
 const path = require('path');
 const fs = require('fs-extra');
@@ -31,57 +33,57 @@ module.exports = {
    * @param  {Boolean} watchmode 是否进行监控。
    * @return {[type]}            [description]
    */
-  async run(watchmode = false){
-    await this.scan();
-    await this.write();
+  run(watchmode = false){
+    let start = new Date().getTime();
+    this.scan(true);
+    this.write();
     if(watchmode){
       this.watch();
     }
-    console.log('插件扫描结果：', cacheList.join(', '));
+    console.log('vgg插件扫描结果：', cacheList.join(', '));
+    console.log('vgg插件扫描耗时：', (new Date().getTime() - start) + 'ms');
   },
   /**
    * 扫描所有插件，创建：插件列表，插件对象列表。
    * 插件读取失败会有error提示，但不终止程序运行。
    *
-   * @return {[type]} [description]
+   * @param {Boolean} force 是否强制忽略缓存重新扫描。
+   * @return {Object}
    */
-  async scan(){
-    cacheList = [];
-    cachePlugins = {};
+  scan(force = false){
+    if(force || !this.scaned){
+      cacheList = [];
+      cachePlugins = {};
 
-    let baseDir = '';
-    // 扫描插件依赖，其中vgg和~是分别表示核心默认插件，分别表示核心目录和工作目录。
-    let defaultPlugins = {
-      'vgg': getRelativePathFromRoot(path.join(__dirname, '../src/')),
-      '~': '~/'
+      // 扫描插件依赖，其中vgg和~分别是核心目录和工作目录。
+      let defaultPlugins = {
+        'vgg': 'vgg',
+        '~': '~'
+      }
+      for(let key in defaultPlugins){
+        let toposort = new Toposort();
+        let pconfig = {};
+        pconfig[key] = defaultPlugins[key];
+        _scan(pconfig, '', defaultPlugins[key], toposort);
+        cacheList = cacheList.concat(toposort.sort().reverse());
+        cacheList = _.pull(cacheList, key);
+        cacheList.push(key);
+      }
+      this.scaned = true;
     }
-    for(let key in defaultPlugins){
-      let toposort = new Toposort();
-      let pconfig = {};
-      pconfig[key] = defaultPlugins[key];
-      await _scan(pconfig, '', defaultPlugins[key], toposort);
-      cacheList = cacheList.concat(toposort.sort().reverse());
-      cacheList = _.pull(cacheList, key);
-      cacheList.push(key);
+
+    // @todo not return it.
+    return {
+      ...cachePlugins
     }
   },
   /**
    * 根据插件目录写入运行时文件
    * @return {[type]} [description]
    */
-  async write(){
+  write(){
     let file = path.join(process.cwd(), 'run', 'plugin_runtime.js');
-    await fs.ensureFile(file)
-      .catch(e => {
-        throw new Error('plugin_runtime.js文件无法创建。')
-      });
-
-    // 写入的内容。
-    let content = createRuntimeFileContent();
-    await fs.writeFile(file, content)
-      .catch(e => {
-        throw new Error('plugin_runtime.js文件无法写入。')
-      });
+    fs.outputFileSync(file, createRuntimeFileContent());
   },
   /**
    * 监测插件配置文件，有变化时，重新创建runtime。
@@ -110,52 +112,70 @@ module.exports = {
       ready = true;
     });
   },
-  watcher: null
+  // 监测者
+  watcher: null,
+  // 是否已经扫描
+  scaned: false,
+  // 插件列表
+  get list(){
+    this.scan();
+    return cacheList;
+  },
+  // 插件对象列表
+  get plugins(){
+    this.scan();
+    return cachePlugins;
+  },
 };
 
 /**
- * 扫描插件配置。
- * @param  {Array} plugins      当前插件列表，key为插件名称, value为插件配置。
- * @param  {String} parentPluginName  父插件名称
- * @param  {Object} toposort     [description]
- * @return {[type]}              [description]
+ * 扫描插件，设置插件对象列表，设置依赖关系表。
+ * @param  {Object} configs  父插件配置（当前插件的package.json）。
+ * @param  {String} parent   父插件名称
+ * @param  {String} baseDir  父插件所在目录
+ * @param  {[type]} toposort 依赖关系表对象
  */
-async function _scan(configs, parent, baseDir, toposort){
+function _scan(configs, parent, baseDir, toposort){
   for(let name in configs){
-    // 扫描依赖插件。
-    if(cachePlugins[name] && cachePlugins[name].scaned) continue;
-
     // 获取基础配置。
-    let config = await processPluginConfig(configs[name], baseDir, name == 'vgg' || name == '~');
+    let config = processPluginConfig(configs[name], baseDir);
     if(!config) continue;
 
+    // 合并插件历史设置。
     if(cachePlugins.hasOwnProperty(name)){
       if(config.components) cachePlugins[name].components = true;
       if(config.routes) cachePlugins[name].routes = true;
-    }else{
-      // 检测是否有效。
+    }
+    // 新增设置
+    else{
       cachePlugins[name] = config;
     }
+    toposort.add(name, !parent || parent == 'vgg' || parent == '~' ? [] : name);
 
-    if(!parent || parent == 'vgg' || parent == '~'){
-      toposort.add(name, []);
-    }else{
-      toposort.add(parent, name);
-    }
-    cachePlugins[name].scaned = true;
-    let depConfigs = getModule('config/plugin', name, false);
-    if(depConfigs){
-      await _scan(depConfigs, name, config.package, toposort);
+    // 扫描子插件。
+    if(!cachePlugins[name].scaned){
+      cachePlugins[name].scaned = true;
+      let depConfigs = getModule('config/plugin', name, false);
+      if(depConfigs){
+        _scan(depConfigs, name, path.join(config.package, 'config'), toposort);
+      }
     }
   }
 }
 
 /**
- * 处理每个插件项，根据基础路径算出真实的文件夹地址。
- * @param  {[type]} item [description]
- * @return {[type]}      [description]
+ * 根据原始配置获取标准配置，标准配置包含：
+ *
+ * - package 插件所在包名称或文件夹相对路径。
+ * - components 是否导入组件
+ * - routes 是否导入路由
+ *
+ * @param  {String|Object}  oriConfig  原始配置
+ * @param  {String}  baseDir    当前包的相对路径地址。
+ * @param  {Boolean} isStartDir 是否是开始目录。
+ * @return {Object}             标准配置对象，原始配置无效则返回null
  */
-async function processPluginConfig(oriConfig, baseDir, isStartDir){
+function processPluginConfig(oriConfig, baseDir){
   let config = {
     package: '',
     components: true,
@@ -170,29 +190,36 @@ async function processPluginConfig(oriConfig, baseDir, isStartDir){
   }
   if(!config.package) return null;
 
-  // 2. 计算所在目录，只在webpack构建时的服务端运行。
-  if(config.package.indexOf('.') == 0){
-    config.package = path.join(baseDir, isStartDir ? '' : 'config', config.package);
+  // 2. 根据目录配置，计算真实文件夹地址和相对地址。
+  let packagePath = config.package,
+      absolutePath, // 真实绝对路径。
+      relativePath; // 相对于/run的路径。
+  // 相对地址型
+  if(packagePath.indexOf('.') == 0){
+    absolutePath = path.join(baseDir, config.package);
+    relativePath = getRelativePathFromRun(absolutePath);
   }
-  else if(config.package.indexOf('/') == 0){
-    config.package = getRelativePathFromRoot(config.package);
+  // 绝对地址型
+  else if(packagePath.indexOf('/') == 0){
+    absolutePath = packagePath;
+    relativePath = getRelativePathFromRun(absolutePath);
   }
-  else if(config.package.indexOf('~') == 0){
-    config.package = path.join(process.cwd(), 'app/web/', config.package.replace('~/', ''));
-    config.package = getRelativePathFromRoot(config.package);
-  }else{
-    config.package = path.join(config.package, 'src');
+  // 相对工作目录型
+  else if(packagePath.indexOf('~') == 0){
+    absolutePath = path.join(process.cwd(), 'app/web/', config.package.replace('~', ''));
+    relativePath = getRelativePathFromRun(absolutePath);
+  }
+  // 普通包目录型
+  else{
+    absolutePath = path.join(path.dirname(require.resolve(packagePath + '/package.json')), 'src');
+    relativePath = path.join(packagePath, 'src');
   }
 
-  // 检测文件夹是否有效。
-  let packageDir = config.package;
-  if(packageDir.indexOf('.') == 0){
-    packageDir = path.join(process.cwd(), 'run', packageDir);
-  }else{
-    packageDir = path.resolve(packageDir);
-  }
-
-  if(!await fs.readdir(packageDir).then(() => true).catch(e => false)){
+  // 3. 检测有效性。
+  try{
+    fs.readdirSync(absolutePath);
+    config.package = relativePath;
+  }catch(e){
     config = null;
   }
   return config;
@@ -203,7 +230,7 @@ async function processPluginConfig(oriConfig, baseDir, isStartDir){
  * @param  {[type]} target [description]
  * @return {[type]}        [description]
  */
-function getRelativePathFromRoot(target){
+function getRelativePathFromRun(target){
   let rootPath = path.join(process.cwd(), 'run/');
   return path.relative(rootPath, target);
 }
@@ -229,6 +256,7 @@ function getModule(modulePath, pluginName, cache = true){
     }
     mod = require(modulePath);
   }catch(e){
+    // 忽略模块找不到的错误。
     if(e instanceof SyntaxError){
       console.error(e);
     }
@@ -258,6 +286,7 @@ function createRuntimeFileContent(){
 
     content += `
       '${name}': {
+        package: '${plugin.package}',
         context: require.context('${plugin.package}', true, ${regx}),
         components: ${plugin.components ? 'true' : 'false'},
         routes: ${plugin.routes ? 'true' : 'false'}

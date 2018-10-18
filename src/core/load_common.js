@@ -8,7 +8,7 @@
  */
 import Vue from 'vue';
 import plugin from './plugin';
-import vgg from '../index';
+import vgg from '../';
 
 export default (context) => {
   let resources = ['directive', 'filter', 'plugins', 'utils'];

@@ -19,5 +19,6 @@ export default () => {
     config = _.defaultsDeep({}, envConfig, defConfig);
     vgg.config = config;
   }
+
   return config;
 }

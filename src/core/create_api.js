@@ -28,7 +28,7 @@
  */
 import _ from 'lodash';
 import plugin from './plugin';
-import vgg from '../index'
+import vgg from '../'
 
 /**
  * api 网关
@@ -42,7 +42,7 @@ export default (ctx) => {
     try{
       // formate name to snakeCase.
       name = name.split('/').map(i => _.snakeCase(i)).join('/');
-      mod = plugin.getModule('api/' + name, pluginName);
+      mod = plugin.getModule('api/modules/' + name, pluginName);
       if(!mod) throw new Error();
     }catch(e){
       let errmsg = `api没有找到模块${name}`;

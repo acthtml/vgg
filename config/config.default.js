@@ -16,6 +16,9 @@ module.exports = appInfo => {
       dir: path.join(appInfo.baseDir, 'public')
     },
     // 是否开启vconsole
-    vconsole: false
+    vconsole: false,
+    vgg: {
+      enabled: true
+    }
   }
 }

@@ -1,4 +1,4 @@
-const webpackConfig = require('egg-easywebpack');
+const webpackConfig = require('vgg-webpack');
 
 module.exports = {
   webpack: {
@@ -8,5 +8,8 @@ module.exports = {
     ]
   },
   // 是否开启vconsole
-  vconsole: true
+  vconsole: true,
+  vgg: {
+    watch: true
+  }
 }

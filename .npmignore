@@ -11,3 +11,4 @@ public/
 app/
 config/
 lib/
+.babelrc

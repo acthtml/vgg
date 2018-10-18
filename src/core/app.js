@@ -27,25 +27,22 @@ import createRouter from './create_router';
  *         - 其他自动绑定的上下文。
  */
 export default (context) => {
-  // 1. 插件进行初始化扫描。
-  // plugin.scan();
-
-  // 2. 加载配置
+  // 1. 加载配置
   loadConfig();
 
-  // 3. 加载通用资源（utils,directive,filter,plugins）。
+  // 2. 加载通用资源（utils,directive,filter,plugins）。
   loadCommon(context);
 
-  // 4. 加载上下文和api
+  // 3. 加载上下文和api
   let ctx = loadContext(context);
 
-  // 5. 创建store/router
+  // 4. 创建store/router
   ctx.store = createStore({...context, ...ctx});
   ctx.router = createRouter({...context, ...ctx});
   // 同步路由状态 @see https://github.com/vuejs/vuex-router-sync
   sync(ctx.store, ctx.router);
 
-  // 6. hook app.contextLoaded
+  // 5. hook app.contextLoaded
   plugin.invokeAll('app.contextLoaded', {...context, ...ctx});
 
   // 返回构造app构造函数，为了在客户端环境，store的状态能在router挂载时初始好，这样就能做

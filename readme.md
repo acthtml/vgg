@@ -1,9 +1,7 @@
 # vgg
 
-vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以插件的形式扩展框架本身。
-
-由vgg提供基础插件功能，由其插件生态圈来扩展框架本身。配合eggjs和vgg工具链来支持服务端和客户
-端的渲染。
+vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以插件的形式扩展框架本身。支持单页面应用
+的服务端和客户端渲染。
 
 架构如下：
 
@@ -11,14 +9,14 @@ vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以�
 |--------------------|
 | vgg + vgg-plugin-* |
 |--------------------|
+|     egg-vgg        |
 |     egg-easyvue    |
 |--------------------|
-| eggjs | vgg-cli    |
-|       | vgg-webpack|
+| eggjs | vgg-webpack|
 |--------------------|
 ```
 
-## 文件目录结构
+## 1. 文件目录结构
 
 ```
   - api                             api service层
@@ -38,7 +36,7 @@ vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以�
     - config.local.js
     - config.stage.js
     - config.prod.js
-    - plugin.js                     插件配置
+    - plugin.json                   插件配置
   - plugins                         插件约定存放文件夹
     - plugin_a
   - router                          路由
@@ -67,7 +65,7 @@ vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以�
 - 插件系统
 
 
-## 环境与配置
+## 2. 环境与配置
 
 根据当前的环境读取对于的配置，运行环境配置参考[eggjs运行环境](https://eggjs.org/zh-cn/basics/env.html)。
 
@@ -98,7 +96,7 @@ vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以�
 ```
 
 
-## 通用vue资源
+## 3. 通用vue资源
 
 框架支持几种vue资源全局性的注入，分别是：
 
@@ -109,7 +107,7 @@ vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以�
 
 只要按照约定，框架会自动注入你配置的资源。
 
-### 组件（components）
+### 3.1 组件（components）
 
 在`components/index.js`中声明组件，key为组件名称，value为需要引入的组件。
 
@@ -129,7 +127,7 @@ vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以�
   export default components;
 ```
 
-### 上下文（common/context）
+### 3.2 上下文（common/context）
 
 在`common/context/index.js`中声明上下文，key为上下文名称，value为上下文创建函数。
 
@@ -154,7 +152,7 @@ vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以�
 
 框架内置的上下文有：cookies, http, logger。
 
-### vue的过滤器、指令、插件
+### 3.3 vue的过滤器、指令、插件
 
 分别对应这些文件夹：`common/filter、common/directive、common/plugin`。
 
@@ -170,7 +168,7 @@ vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以�
   Vue.use(plugins[key]);
 ```
 
-### 工具类库（common/utils）
+### 3.4 工具类库（common/utils）
 
 全局性的工具类库，注入到vgg.utils中。
 
@@ -185,11 +183,11 @@ vgg是根据vue技术栈的最佳实践总结而来的技术架构，它能以�
   vgg.utils.now();
 ```
 
-## store
+## 4. store
 
 store是vuex的实现，[文章和架构参考](https://vuex.vuejs.org/zh-cn/structure.html)。
 
-### 创建store module
+### 4.1 创建store module
 
 在文件夹`store/modules`中创建模块，创建之后，即可使用`store.register`对模块进行注册，文件
 命名采用`snake_case`规则。
@@ -210,7 +208,7 @@ store是vuex的实现，[文章和架构参考](https://vuex.vuejs.org/zh-cn/str
   }
 ```
 
-### 使用store module
+### 4.2 使用store module
 
 要使用模块，先要使用`store.register()`进行模块注册。注册的本质是获取对应的store模块，调用
 `store.registerModule()`注册到对应的命名空间中。
@@ -245,17 +243,17 @@ store是vuex的实现，[文章和架构参考](https://vuex.vuejs.org/zh-cn/str
 - store.has(type, namespace, name)
 - store.try(type, namespace, name, ...args)
 
-## 注意点
+``注意点``
 
 1. 如果模块需要在组件beforeCreate生命周期(包含beforeCreate)前使用，那么这个模块需要在路由
 组件的asyncData中注入。[参考服务器端数据预取](https://ssr.vuejs.org/zh/data.html)
 2. 保留命名空间'route'。[参考vue-router-sync](https://github.com/vuejs/vuex-router-sync)
 
-## api服务层
+## 5. api服务层
 
 类似于service层，用于跟后端进行数据交互。
 
-### api的创建
+### 5.1 api的创建
 
 api在文件夹`api/modules`中创建，创建后可在组件、store中使用，文件名采用`snake_case`规范。
 
@@ -275,7 +273,7 @@ api在文件夹`api/modules`中创建，创建后可在组件、store中使用�
   }
 ```
 
-### api的使用
+### 5.2 api的使用
 
 在`store`中，api被注入到上下文appContext中。
 
@@ -312,7 +310,7 @@ api在文件夹`api/modules`中创建，创建后可在组件、store中使用�
 ```
 
 
-## 路由
+## 6. 路由
 
 路由是基于[vue-router](https://router.vuejs.org/zh-cn/)实现的，在`router/routes.js`
 中添加路由，配置同`vue-router`。
@@ -327,11 +325,11 @@ api在文件夹`api/modules`中创建，创建后可在组件、store中使用�
 - hook router.afterEach
 
 
-## 插件
+## 7. 插件
 
 框架通过插件来扩展自身，可以扩展框架的所有内容。
 
-### 使用插件
+### 7.1 使用插件
 
 在文件夹`config/plugin.js`中来声明要使用的插件。
 
@@ -366,7 +364,7 @@ api在文件夹`api/modules`中创建，创建后可在组件、store中使用�
   this.$store.register('$pluginA/user');
 ```
 
-### 创建插件
+### 7.2 创建插件
 
 @todo
 
