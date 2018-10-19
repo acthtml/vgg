@@ -1,12 +1,25 @@
 {
-  "presets": [["env", {"modules": false}]],
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "modules": false,
+        "useBuiltIns": "usage",
+        "targets": {
+          "browsers": [
+            "> 1%",
+            "last 2 versions",
+            "not ie <= 8"
+          ]
+        }
+      }
+    ]
+  ],
   "plugins": [
-    "transform-vue-jsx",
-    "syntax-async-functions",
-    "syntax-dynamic-import",
-    "transform-async-to-generator",
-    "transform-regenerator",
-    "transform-runtime",
-    "transform-object-rest-spread"
+    "@babel/plugin-proposal-object-rest-spread",
+    "@babel/plugin-syntax-dynamic-import",
+    "@babel/plugin-transform-async-to-generator",
+    "@babel/plugin-transform-regenerator",
+    "@babel/plugin-transform-runtime",
   ]
 }

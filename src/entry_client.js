@@ -5,7 +5,7 @@
  *
  * @see  https://github.com/vuejs/vue-hackernews-2.0/blob/master/src/entry-client.js
  */
-import 'babel-polyfill';
+// import 'babel-polyfill';
 import createApp from './core/app';
 import plugin from './core/plugin';
 
