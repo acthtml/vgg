@@ -14,6 +14,7 @@ import loadContext from './load_context';
 import loadAppComponent from './load_app_component';
 import createStore from './create_store';
 import createRouter from './create_router';
+import '~/common/plugins/mint_ui';
 
 /**
  * 初始化前后端通用的app实例，返回appContext。
@@ -30,11 +31,11 @@ export default (context) => {
   // 1. 加载配置
   loadConfig();
 
-  // 2. 加载通用资源（utils,directive,filter,plugins）。
-  loadCommon(context);
-
-  // 3. 加载上下文和api
+  // 2. 加载上下文和api
   let ctx = loadContext(context);
+
+  // 3. 加载通用资源（utils,directive,filter,plugins）。
+  loadCommon(context);
 
   // 4. 创建store/router
   ctx.store = createStore({...context, ...ctx});

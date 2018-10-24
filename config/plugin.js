@@ -17,5 +17,9 @@ module.exports = {
   easyvue: {
     enable: true,
     package: "egg-easyvue"
+  },
+  vgg: {
+    enable: true,
+    package: "egg-vgg"
   }
 }

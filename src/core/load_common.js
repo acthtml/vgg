@@ -6,25 +6,33 @@
  *
  * @module core/load_common
  */
+import _ from 'lodash';
 import Vue from 'vue';
 import plugin from './plugin';
 import vgg from '../';
 
 export default (context) => {
-  let resources = ['directive', 'filter', 'plugins', 'utils'];
+  let resources = ['utils', 'directive', 'filter', 'plugins', 'components'];
+  vgg.utils = {};
   resources.forEach(resource => {
-    let sets = plugin.assign(`common/${resource}`);
-    if(resource == 'utils'){
-      vgg.utils = sets;
-      return;
-    }
-
-    for(let key in sets){
-      if(resource == 'plugins'){
-        Vue.use(sets[key]);
-      }else{
-        Vue[resource](key, sets[key]);
+    let modulePath = resource == 'components' ? 'components' : `common/${resource}`;
+    plugin.each(modulePath, (rst, pluginName) => {
+      if(!_.isObject(rst)){
+        throw new Error(`插件${pluginName}的对应的模块${modulePath}默认输出应该是对象。`);
       }
-    }
+      for(let key in rst){
+        if(resource == 'utils'){
+          vgg.utils[key] = rst[key];
+        }else if(resource == 'plugins'){
+          Vue.use(rst[key]);
+        }else if(resource == 'filter' || resource == 'directive'){
+          Vue[resource](key, rst[key]);
+        }else if(resource == 'components'){
+          if(plugin.pluginRuntime[pluginName].components){
+            Vue.component(key, rst[key]);
+          }
+        }
+      }
+    })
   })
 }

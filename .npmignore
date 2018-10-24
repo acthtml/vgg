@@ -12,3 +12,4 @@ app/
 config/
 lib/
 .babelrc
+package-lock.json

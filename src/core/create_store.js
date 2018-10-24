@@ -40,11 +40,13 @@ export default context => {
     let {filename, pluginName} = plugin.parseModulePath(modulepath);
     filename = filename.split('/').map(i => _.snakeCase(i)).join('/');
     try{
-      let mod = plugin.getModule('store/moduels/' + filename, pluginName);
+      let mod = plugin.getModule('store/modules/' + filename, pluginName);
+      mod(namespace, {...context, store}, ...args)
       this.registerModule(namespace, mod(namespace, {...context, store}, ...args));
       return true;
     }catch(e){
-      throw new Error(`store ${namespace}注册出错，filename:${filename}, pluginName:${pluginName}`);
+      e.name = e.name + `（store ${namespace}注册出错，filename:${filename}, pluginName:${pluginName}）`
+      throw e;
     }
   }
 
