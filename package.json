@@ -1,6 +1,6 @@
 {
   "name": "vgg",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "基于eggjs的vue spa框架。允许以插件的形式添加任何资源（路由，组件，接口，store...）",
   "main": "./src/index.js",
   "scripts": {

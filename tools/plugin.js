@@ -268,12 +268,15 @@ function getModule(modulePath, pluginName, cache = true){
  * 创建plugin_time.js文件的文本内容。
  * @return {[type]} [description]
  */
-function createRuntimeFileContent(){
+function createRuntimeFileContent(env = 'local'){
   let content = '';
   for(let i = 0; i < cacheList.length; i++){
     let name = cacheList[i],
         plugin = cachePlugins[name],
-        regx = '/(api\\/.*|store\\/.*|config\\/.*|common\\/(context|directive|filter|plugins|utils)\\/index|views\\/app';
+        regx = '/(api\\/.*|store\\/.*|common\\/(context|directive|filter|plugins|utils)\\/index|views\\/app';
+    // configs
+    regx += `|config\\/(plugin|config\\.(default|${env}))`;
+
     if(plugin.components){
       regx += '|components\\/index';
     }
