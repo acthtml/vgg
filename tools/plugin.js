@@ -218,6 +218,8 @@ function processPluginConfig(oriConfig, baseDir){
   // 3. 检测有效性。
   try{
     fs.readdirSync(absolutePath);
+    // 兼容windows环境
+    relativePath = relativePath.replace(/\\/ig, '/');
     config.package = relativePath;
   }catch(e){
     config = null;

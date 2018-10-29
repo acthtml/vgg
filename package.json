@@ -1,17 +1,17 @@
 {
   "name": "vgg",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "基于eggjs的vue spa框架。允许以插件的形式添加任何资源（路由，组件，接口，store...）",
   "main": "./src/index.js",
   "scripts": {
     "build": "easywebpack-build && npm run deploy-static",
-    "build-uat": "export EGG_SERVER_ENV=unittest && npm run build",
-    "build-qa": "export EGG_SERVER_ENV=qa && npm run build",
-    "build-stage": "export EGG_SERVER_ENV=stage && npm run build",
-    "build-product": "export EGG_SERVER_ENV=prod && npm run build",
+    "build-uat": "cross-env EGG_SERVER_ENV=unittest npm run build",
+    "build-qa": "cross-env EGG_SERVER_ENV=qa npm run build",
+    "build-stage": "cross-env EGG_SERVER_ENV=stage npm run build",
+    "build-product": "cross-env EGG_SERVER_ENV=prod npm run build",
     "lint": "eslint .",
     "test": "npm run lint -- --fix && egg-bin test",
-    "dev": "egg-bin dev",
+    "dev": "cross-env EGG_SERVER_ENV=local egg-bin dev",
     "debug": "egg-bin debug",
     "start-bg": "npm run online && eggctl start --daemon",
     "start": "npm run online && eggctl start",
@@ -20,6 +20,7 @@
     "online": "heartcheck-online"
   },
   "dependencies": {
+    "cross-env": "^5.2.0",
     "axios": "^0.17.1",
     "chokidar": "^2.0.4",
     "fs-extra": "^5.0.0",
