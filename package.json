@@ -1,6 +1,6 @@
 {
   "name": "vgg",
-  "version": "0.0.12",
+  "version": "0.1.2",
   "description": "基于eggjs的vue spa框架。允许以插件的形式添加任何资源（路由，组件，接口，store...）",
   "main": "./src/index.js",
   "scripts": {
@@ -19,6 +19,9 @@
     "offline": "heartcheck-offline",
     "online": "heartcheck-online"
   },
+  "bin": {
+    "vgg-build": "./tools/build.js"
+  },
   "dependencies": {
     "cross-env": "^5.2.0",
     "axios": "^0.17.1",
@@ -30,7 +33,36 @@
     "vue": "^2.5.16",
     "vue-router": "^2.7.0",
     "vuex": "^2.4.1",
-    "vuex-router-sync": "^5.0.0"
+    "vuex-router-sync": "^5.0.0",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/plugin-transform-async-to-generator": "^7.1.0",
+    "@babel/plugin-transform-regenerator": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/runtime": "^7.1.2",
+    "autoprefixer": "^8.0.0",
+    "autoprefixer-loader": "^3.2.0",
+    "babel-loader": "^8.0.0-beta.0",
+    "babel-plugin-transform-vue-jsx": "^3.7.0",
+    "core-js": "^2.5.7",
+    "css-loader": "^0.28.7",
+    "extract-text-webpack-plugin": "^3.0.1",
+    "file-loader": "^1.1.5",
+    "html-loader": "^0.5.1",
+    "postcss-loader": "^2.1.1",
+    "progress-bar-webpack-plugin": "^1.11.0",
+    "style-loader": "^0.19.0",
+    "url-loader": "^0.6.2",
+    "vue-loader": "^15.4.2",
+    "vue-server-renderer": "^2.5.16",
+    "vue-template-compiler": "^2.5.16",
+    "webpack": "^3.4.1",
+    "webpack-merge": "^4.1.2",
+    "webpack-node-externals": "^1.6.0",
+    "webpack-tool": "^3.1.4",
+    "workbox-webpack-plugin": "^3.6.3"
   },
   "devDependencies": {
     "autod": "^2.8.0",
