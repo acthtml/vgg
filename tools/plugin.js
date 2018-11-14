@@ -33,10 +33,10 @@ module.exports = {
    * @param  {Boolean} watchmode 是否进行监控。
    * @return {[type]}            [description]
    */
-  run(watchmode = false){
+  run(watchmode = false, env = 'local'){
     let start = new Date().getTime();
     this.scan(true);
-    this.write();
+    this.write(env);
     if(watchmode){
       this.watch();
     }
@@ -81,9 +81,9 @@ module.exports = {
    * 根据插件目录写入运行时文件
    * @return {[type]} [description]
    */
-  write(){
+  write(env = 'local'){
     let file = path.join(process.cwd(), 'run', 'plugin_runtime.js');
-    fs.outputFileSync(file, createRuntimeFileContent());
+    fs.outputFileSync(file, createRuntimeFileContent(env));
   },
   /**
    * 监测插件配置文件，有变化时，重新创建runtime。
