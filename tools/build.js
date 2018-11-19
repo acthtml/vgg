@@ -11,7 +11,7 @@ const WebpackTool = require('webpack-tool');
 const webpackConfig = require('./webpack_config');
 const env = process.env.EGG_SERVER_ENV || 'local';
 
-async function build(config){
+async function builder(config){
   const webpackTool = new WebpackTool({
     view: false,
     isServerBuild: false
@@ -57,4 +57,3 @@ run().catch(e => {
   if(_.isError(e)) e.name = '构建出错:' + e.name;
   throw e;
 });
-

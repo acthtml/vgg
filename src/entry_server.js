@@ -25,7 +25,7 @@ export default context => {
       // no matched routes
       if (!matchedComponents.length) {
         // @todo
-        return rej({ code: 404 })
+        return rej(404)
       }
 
       Promise.all(matchedComponents.map(({ asyncData }) => asyncData && asyncData({
@@ -39,5 +39,3 @@ export default context => {
     }, rej)
   })
 }
-
-

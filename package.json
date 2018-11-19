@@ -1,23 +1,12 @@
 {
   "name": "vgg",
-  "version": "0.1.2",
-  "description": "基于eggjs的vue spa框架。允许以插件的形式添加任何资源（路由，组件，接口，store...）",
+  "version": "0.1.6",
+  "description": "vue的SPA框架，允许以插件的形式来扩展框架本身。",
   "main": "./src/index.js",
   "scripts": {
-    "build": "easywebpack-build && npm run deploy-static",
-    "build-uat": "cross-env EGG_SERVER_ENV=unittest npm run build",
-    "build-qa": "cross-env EGG_SERVER_ENV=qa npm run build",
-    "build-stage": "cross-env EGG_SERVER_ENV=stage npm run build",
-    "build-product": "cross-env EGG_SERVER_ENV=prod npm run build",
-    "lint": "eslint .",
-    "test": "npm run lint -- --fix && egg-bin test",
-    "dev": "cross-env EGG_SERVER_ENV=local egg-bin dev",
-    "debug": "egg-bin debug",
-    "start-bg": "npm run online && eggctl start --daemon",
-    "start": "npm run online && eggctl start",
-    "stop": "eggctl stop",
-    "offline": "heartcheck-offline",
-    "online": "heartcheck-online"
+    "build": "vgg-build",
+    "dev": "egg-bin dev",
+    "start": "eggctl start"
   },
   "bin": {
     "vgg-build": "./tools/build.js"
@@ -76,5 +65,9 @@
     "vue-template-compiler": "^2.5.16",
     "yargs": "^12.0.2"
   },
-  "author": "acthtml"
+  "author": "acthtml",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/acthtml/vgg.git"
+  }
 }

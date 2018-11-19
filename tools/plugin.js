@@ -83,7 +83,12 @@ module.exports = {
    */
   write(env = 'local'){
     let file = path.join(process.cwd(), 'run', 'plugin_runtime.js');
-    fs.outputFileSync(file, createRuntimeFileContent(env));
+    try{
+      fs.outputFileSync(file, createRuntimeFileContent(env));
+    }catch(e){
+      e.name = 'plugin_runtime.js写入错误：' + e.name;
+      throw e;
+    }
   },
   /**
    * 监测插件配置文件，有变化时，重新创建runtime。
@@ -267,7 +272,7 @@ function getModule(modulePath, pluginName, cache = true){
 }
 
 /**
- * 创建plugin_time.js文件的文本内容。
+ * 创建plugin_runtime.js文件的文本内容。
  * @return {[type]} [description]
  */
 function createRuntimeFileContent(env = 'local'){

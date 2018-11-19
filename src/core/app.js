@@ -14,7 +14,6 @@ import loadContext from './load_context';
 import loadAppComponent from './load_app_component';
 import createStore from './create_store';
 import createRouter from './create_router';
-import '~/common/plugins/mint_ui';
 
 /**
  * 初始化前后端通用的app实例，返回appContext。
