@@ -41,7 +41,7 @@ module.exports = (env = "local", options) => {
           // loader: ['css-loader'],
           // extract text plugin有些问题
           use: ExtractTextPlugin.extract({
-            fallback: "style-loader",
+            fallback: "vue-style-loader",
             use: [
               { loader: "css-loader", options: { importLoaders: 1 } },
               {
