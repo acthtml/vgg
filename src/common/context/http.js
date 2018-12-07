@@ -29,7 +29,9 @@ export default (context, ctx) => {
   http.defaults.withCredentials = true;
 
   // hook app.alterContextHttp
-  vgg.plugin.invokeAll('app.alterContextHttp', context, ctx);
+  let altor = {...context, ctx, http}
+  vgg.plugin.invokeAll('app.alterContextHttp', altor);
+  http = altor.http;
   vgg.http = http;
   return http;
 }

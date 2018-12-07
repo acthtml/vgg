@@ -69,7 +69,9 @@ const creator = (context, ctx) => {
   }
 
   // hook app.alterContextCookies
-  vgg.plugin.invokeAll('app.alterContextCookies', context, ctx);
+  let altor = {...context, ctx, cookies: creation};
+  vgg.plugin.invokeAll('app.alterContextCookies', altor);
+  creation = altor.cookies;
   vgg.cookies = creation;
   return creation;
 }

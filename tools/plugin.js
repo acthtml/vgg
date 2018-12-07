@@ -280,7 +280,7 @@ function createRuntimeFileContent(env = 'local'){
   for(let i = 0; i < cacheList.length; i++){
     let name = cacheList[i],
         plugin = cachePlugins[name],
-        regx = '/(api\\/.*|store\\/.*|common\\/(context|directive|filter|plugins|utils)\\/index|views\\/app';
+        regx = '/(app|api\\/.*|store\\/.*|common\\/(context|directive|filter|plugins|utils)\\/index|views\\/app';
     // configs
     regx += `|config\\/(plugin|config\\.(default|${env}))`;
 

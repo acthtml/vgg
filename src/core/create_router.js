@@ -67,7 +67,9 @@ export default (context) => {
   });
 
   // hook router.alter
-  plugin.invokeAll('router.alter', {...context, router});
+  let altor = {...context, router};
+  plugin.invokeAll('router.alter', altor);
+  router = altor.router;
   return router;
 };
 

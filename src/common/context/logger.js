@@ -29,7 +29,9 @@ export default (context, ctx) => {
   }
 
   // hook app.alterContextLogger
-  vgg.plugin.invokeAll('app.alterContextLogger', context, ctx);
+  let altor = {...context, ctx, logger};
+  vgg.plugin.invokeAll('app.alterContextLogger', altor);
+  logger = altor.logger;
   vgg.logger = logger;
   return logger;
 }

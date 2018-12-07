@@ -146,7 +146,9 @@ export default context => {
   }
 
   // Hook store.alter
-  plugin.invokeAll('store.alter', {...context, store});
+  let altor = {...context, store};
+  plugin.invokeAll('store.alter', altor);
+  store = altor.store;
   return store;
 }
 

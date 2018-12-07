@@ -1,6 +1,6 @@
 {
   "name": "vgg",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "description": "vue的SPA框架，允许以插件的形式来扩展框架本身。",
   "main": "./src/index.js",
   "scripts": {
