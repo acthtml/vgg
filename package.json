@@ -1,6 +1,6 @@
 {
   "name": "vgg",
-  "version": "0.1.9",
+  "version": "0.1.17",
   "description": "vue的SPA框架，允许以插件的形式来扩展框架本身。",
   "main": "./src/index.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "vue-router": "^2.7.0",
     "vuex": "^2.4.1",
     "vuex-router-sync": "^5.0.0",
-    "@babel/core": "^7.1.2",
+    "@babel/core": "7.2.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-transform-async-to-generator": "^7.1.0",
@@ -33,7 +33,7 @@
     "@babel/runtime": "^7.1.2",
     "autoprefixer": "^8.0.0",
     "autoprefixer-loader": "^3.2.0",
-    "babel-loader": "^8.0.0-beta.0",
+    "babel-loader": "8.0.4",
     "babel-plugin-transform-vue-jsx": "^3.7.0",
     "core-js": "^2.5.7",
     "css-loader": "^0.28.7",
@@ -61,7 +61,7 @@
     "egg-heartcheck": "^0.0.1",
     "egg-scripts": "^2.5.0",
     "egg-validate": "^1.0.0",
-    "egg-vgg": "0.0.2",
+    "egg-vgg": "0.3.15",
     "vue-template-compiler": "^2.5.16",
     "yargs": "^12.0.2"
   },
