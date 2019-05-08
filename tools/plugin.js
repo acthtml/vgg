@@ -17,9 +17,8 @@ let cacheList;
 /**
  * 插件对象列表，其key为插件名，value为对应插件的配置属性。其被系统解析后，会有这些属性：
  *
- * - package 插件的包名称或相对路径名称。是根据插件配置转换而来的。如果路径是包名的话，则转
- *   换到`${package}/src`；如果是相对路径的话，则转换成相对于`${process.cwd()}/run`的根
- *   目录。此属性值最后用到/run/plugin_context.js中。
+ * - package 插件的包名称或相对路径。根据插件所对应的路径最后转换为对于`${process.cwd()}/run`
+ *   目录的相对路径。如果路径是包名的话，则转换到`${package}/src`；此属性值最后用于/run/plugin_runtime.js
  * - components 是否注入组件。
  * - routes 是否注入路由。
  *
@@ -162,7 +161,7 @@ function _scan(configs, parent, baseDir, toposort){
       cachePlugins[name].scaned = true;
       let depConfigs = getModule('config/plugin', name, false);
       if(depConfigs){
-        _scan(depConfigs, name, path.join(config.package, 'config'), toposort);
+        _scan(depConfigs, name, path.join(config.package, 'config/'), toposort);
       }
     }
   }
@@ -176,7 +175,7 @@ function _scan(configs, parent, baseDir, toposort){
  * - routes 是否导入路由
  *
  * @param  {String|Object}  oriConfig  原始配置
- * @param  {String}  baseDir    当前包的相对路径地址。
+ * @param  {String}  baseDir    当前包的基础路径绝对地址。
  * @param  {Boolean} isStartDir 是否是开始目录。
  * @return {Object}             标准配置对象，原始配置无效则返回null
  */
@@ -201,7 +200,7 @@ function processPluginConfig(oriConfig, baseDir){
       relativePath; // 相对于/run的路径。
   // 相对地址型
   if(packagePath.indexOf('.') == 0){
-    absolutePath = path.join(baseDir, config.package);
+    absolutePath = path.join(process.cwd(), 'run/', baseDir, packagePath);
     relativePath = getRelativePathFromRun(absolutePath);
   }
   // 绝对地址型
@@ -211,13 +210,13 @@ function processPluginConfig(oriConfig, baseDir){
   }
   // 相对工作目录型
   else if(packagePath.indexOf('~') == 0){
-    absolutePath = path.join(process.cwd(), 'app/web/', config.package.replace('~', ''));
+    absolutePath = path.join(process.cwd(), 'app/web/', packagePath.replace('~', ''));
     relativePath = getRelativePathFromRun(absolutePath);
   }
   // 普通包目录型
   else{
-    absolutePath = path.join(path.dirname(require.resolve(packagePath + '/package.json')), 'src');
-    relativePath = path.join(packagePath, 'src');
+    absolutePath = path.join(path.dirname(require.resolve(packagePath + '/package.json')), 'src/');
+    relativePath = path.join(packagePath, 'src/');
   }
 
   // 3. 检测有效性。

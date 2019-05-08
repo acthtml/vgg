@@ -1,6 +1,6 @@
 {
   "name": "vgg",
-  "version": "0.1.17",
+  "version": "0.2.3",
   "description": "vue的SPA框架，允许以插件的形式来扩展框架本身。",
   "main": "./src/index.js",
   "scripts": {
@@ -19,7 +19,7 @@
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.4",
     "toposort-class": "^1.0.1",
-    "vue": "^2.5.16",
+    "vue": "^2.5.20",
     "vue-router": "^2.7.0",
     "vuex": "^2.4.1",
     "vuex-router-sync": "^5.0.0",
@@ -45,8 +45,8 @@
     "style-loader": "^0.19.0",
     "url-loader": "^0.6.2",
     "vue-loader": "^15.4.2",
-    "vue-server-renderer": "^2.5.16",
-    "vue-template-compiler": "^2.5.16",
+    "vue-server-renderer": "^2.5.20",
+    "vue-template-compiler": "^2.5.20",
     "webpack": "^3.4.1",
     "webpack-merge": "^4.1.2",
     "webpack-node-externals": "^1.6.0",
@@ -55,14 +55,12 @@
   },
   "devDependencies": {
     "autod": "^2.8.0",
-    "core-js": "^2.5.7",
     "egg": "^1.11.0",
     "egg-bin": "^3.4.0",
     "egg-heartcheck": "^0.0.1",
     "egg-scripts": "^2.5.0",
     "egg-validate": "^1.0.0",
-    "egg-vgg": "0.3.15",
-    "vue-template-compiler": "^2.5.16",
+    "egg-vgg": "0.4.3",
     "yargs": "^12.0.2"
   },
   "author": "acthtml",
