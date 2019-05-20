@@ -15,6 +15,9 @@ if (window.__INITIAL_STATE__) {
   store.replaceState(window.__INITIAL_STATE__)
 }
 
+// hook app.appBeforeCreate
+plugin.invokeAll('app.appBeforeCreate', appContext);
+
 // 需要store同步状态之后才能创建vue实例，这样就能在vue-router beforeEach中获取相应的权限
 // 状态了。
 const app = appCreator();
