@@ -1,6 +1,6 @@
 {
   "name": "vgg",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "vue的SPA框架，允许以插件的形式来扩展框架本身。",
   "main": "./src/index.js",
   "scripts": {
@@ -60,7 +60,7 @@
     "egg-heartcheck": "^0.0.1",
     "egg-scripts": "^2.5.0",
     "egg-validate": "^1.0.0",
-    "egg-vgg": "0.4.3",
+    "egg-vgg": "^0.4.4",
     "yargs": "^12.0.2"
   },
   "author": "acthtml",

@@ -24,7 +24,11 @@ export default (context) => {
         if(resource == 'utils'){
           vgg.utils[key] = rst[key];
         }else if(resource == 'plugins'){
-          Vue.use(rst[key]);
+          let args = [rst[key]];
+          if(_.isArray(rst[key])){
+            args = rst[key];
+          }
+          Vue.use(...args);
         }else if(resource == 'filter' || resource == 'directive'){
           Vue[resource](key, rst[key]);
         }else if(resource == 'components'){
@@ -36,3 +40,4 @@ export default (context) => {
     })
   })
 }
+
